@@ -1,15 +1,9 @@
-#**Traffic Sign Recognition** 
-
-##Writeup Template
-
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
+# **Traffic Sign Recognition** 
 
 **Build a Traffic Sign Recognition Project**
 
 The goals / steps of this project are the following:
-* Load the data set (see below for links to the project data set)
+* Load the data set
 * Explore, summarize and visualize the data set
 * Design, train and test a model architecture
 * Use the model to make predictions on new images
@@ -22,80 +16,69 @@ The goals / steps of this project are the following:
 [image1]: ./examples/visualization.jpg "Visualization"
 [image2]: ./examples/grayscale.jpg "Grayscaling"
 [image3]: ./examples/random_noise.jpg "Random Noise"
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
+[image4]: ./internet-test-images/children_crossing.jpg "Children Crossing"
+[image5]: ./internet-test-images/no_entry.jpg "Traffic Sign 2"
+[image6]: ./internet-test-images/no_truck_passing.jpg "Traffic Sign 3"
+[image7]: ./internet-test-images/right_turn.jpg "Traffic Sign 4"
+[image8]: ./internet-test-images/stop.jpg "Traffic Sign 5"
 
 ## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
-
----
-###Writeup / README
-
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one. You can submit your writeup as markdown or pdf. You can use this template as a guide for writing the report. The submission includes the project code.
 
 You're reading it! and here is a link to my [project code](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/Traffic_Sign_Classifier.ipynb)
 
-###Data Set Summary & Exploration
+### Dataset Exploration
 
-####1. Provide a basic summary of the data set. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
+After loading the provided dataset, I aggregated a few key metrics about the dataset. The training set is quite large, with 34799 color image entries. The test set is slightly smaller, with only 12630 color image entries. All of the provided images are already formatted to be 32x32 pixels in shape, with 3 color channels. The classification key provided in the `sign_names.csv` file indicated that there are 43 classes of traffic sign in this dataset.
 
-I used the pandas library to calculate summary statistics of the traffic
-signs data set:
+I created a histogram of the training set by classification label. This revealed that the training set was unbalanced in regards to the number of examples provided for each of the classification labels.
 
-* The size of training set is ?
-* The size of the validation set is ?
-* The size of test set is ?
-* The shape of a traffic sign image is ?
-* The number of unique classes/labels in the data set is ?
+![image](https://cloud.githubusercontent.com/assets/865759/25776214/89e749bc-3286-11e7-8e5c-a2055a58b00b.png)
 
-####2. Include an exploratory visualization of the dataset.
+I also plotted some of the images themselves to get an idea of what they look like in the given format. Here is one example:
 
-Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
+![image](https://cloud.githubusercontent.com/assets/865759/25776447/63adb104-328c-11e7-8baf-1c93b925d897.png)
 
-![alt text][image1]
+### Dataset Preprocessing
 
-###Design and Test a Model Architecture
+One obvious preprocessing step is to convert the color images into a more compact format that retains the visual features of the images. Grayscale is a good candidate, and it is the conversion which I used in this project. Below is an example image after grayscale conversion:
 
-####1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
+![image](https://cloud.githubusercontent.com/assets/865759/25776486/3aa6cb64-328d-11e7-8cc9-534a51cb9a2d.png)
 
-As a first step, I decided to convert the images to grayscale because ...
+The provided training set distribution has clear imbalances between the number of examples for each classification. These imbalances need to be reduced without reducing the available training data. I chose to do this by augmenting the training set to include new copies of slightly-altered images based off of the original set. The first augmentation was performed by rotating the images, and I performed rotations to only the images which needed additional examples to bring the distribution into balance.
 
-Here is an example of a traffic sign image before and after grayscaling.
+Here is the class distribution after the rotation augmentaion:
 
-![alt text][image2]
+![image](https://cloud.githubusercontent.com/assets/865759/25776494/83497c2c-328d-11e7-8eab-239d9e1b1800.png)
 
-As a last step, I normalized the image data because ...
+The next preprocessing step that I performed was further augmentation to generate more new images. This time, the augmentation step generated new images by small translations about the original base images. These translations would provide deviation from the original training set to allow the model to discern features independently of location within the image.
 
-I decided to generate additional data because ... 
+Here is the class distribution after the translation augmentation:
 
-To add more data to the the data set, I used the following techniques because ... 
+![image](https://cloud.githubusercontent.com/assets/865759/25776517/389c3a74-328e-11e7-9d6b-2f00969ebd3e.png)
 
-Here is an example of an original image and an augmented image:
-
-![alt text][image3]
-
-The difference between the original data set and the augmented data set is the following ... 
-
-
-####2. Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
+### Model Architecture
 
 My final model consisted of the following layers:
 
-| Layer         		|     Description	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| Input         		| 32x32x3 RGB image   							| 
-| Convolution 3x3     	| 1x1 stride, same padding, outputs 32x32x64 	|
-| RELU					|												|
-| Max pooling	      	| 2x2 stride,  outputs 16x16x64 				|
-| Convolution 3x3	    | etc.      									|
-| Fully connected		| etc.        									|
-| Softmax				| etc.        									|
-|						|												|
-|						|												|
- 
+|Layer| Description|
+|:-------------------------:|:-----------------------------:|
+|Input| 32x32x1 Grayscale Image|
+|Convolution 5x5| 1x1 stride, valid padding, outputs 28x28x6|
+|RELU Activation||
+|Max Pooling| 2x2 stride, outputs 14x14x6|
+|Convolution 5x5| 1x1 stride, valid padding, outputs 10x10x16|
+|RELU Activation||
+|Max Pooling| 2x2 stride, outputs 5x5x16|
+|Flatten & Concatenate Conv1 and Conv2| Output a single vector of size 1576|
+|Fully Connected| Outputs 120|
+|RELU Activation||
+|Fully Connected| Outputs 84|
+|RELU Activation||
+|Fully Connected| Outputs 43|
+
+I adapted the LeNet architecture for this problem. I took a few suggestions from [this paper](http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf). Particularly the suggestion to concatenate the outputs of each of the two convolutions and send them both into the fully connected layers prior to the classification logits.
+
+# TODO: FINISH THE REST
 
 
 ####3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
