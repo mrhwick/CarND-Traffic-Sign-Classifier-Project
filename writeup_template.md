@@ -70,9 +70,9 @@ My final model consisted of the following layers:
 |RELU Activation||
 |Max Pooling| 2x2 stride, outputs 5x5x16|
 |Flatten & Concatenate Conv1 and Conv2| Output a single vector of size 1576|
-|Fully Connected| Outputs 120|
+|Fully Connected| Outputs 150|
 |RELU Activation||
-|Fully Connected| Outputs 84|
+|Fully Connected| Outputs 90|
 |RELU Activation||
 |Fully Connected| Outputs 43|
 
